@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulse — World News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0c0c0c;--bg2:#141414;--bg3:#1c1c1c;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.16);
+  --text:#f0ede8;--text2:rgba(240,237,232,.55);--text3:rgba(240,237,232,.28);
+  --accent:#e8d5b0;
+  --iran-bg:#1a0505;--iran-dark:#0e0303;--iran-acc:#c0392b;
+  --iran-txt:#f5c6c6;--iran-mut:rgba(245,198,198,.45);--iran-bdr:rgba(192,57,43,.25);
+  --narr-bg:#060614;--narr-dark:#03030f;--narr-acc:#6c5ce7;
+  --narr-txt:#c4b8f5;--narr-mut:rgba(196,184,245,.45);--narr-bdr:rgba(108,92,231,.25);
+  --r:10px;--rsm:6px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── TOPBAR ── */
+#topbar{position:sticky;top:0;z-index:100;background:rgba(12,12,12,.94);backdrop-filter:blur(12px);border-bottom:.5px solid var(--border);padding:10px 24px;display:flex;flex-direction:column;gap:8px}
+.tbrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.logo{font-family:'Instrument Serif',serif;font-size:18px;color:var(--accent);letter-spacing:-.3px;flex-shrink:0}
+.logo em{font-style:italic}
+.flabel{font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);flex-shrink:0}
+.fgroup{display:flex;gap:5px;flex-wrap:wrap;flex:1}
+.chip{font-size:11px;padding:4px 11px;border-radius:20px;border:.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{border-color:var(--border2);color:var(--text)}
+.chip.at{background:var(--accent);color:#0c0c0c;border-color:transparent;font-weight:500}
+.chip.ar{background:#1a2a4a;color:#7ab3e8;border-color:#2a4a7a}
+.fbtn{font-size:12px;padding:6px 14px;border-radius:var(--rsm);border:.5px solid var(--border2);background:transparent;color:var(--text);cursor:pointer;transition:all .15s;flex-shrink:0}
+.fbtn:hover{background:var(--bg3)}
+
+/* ── STORY BANNERS ── */
+#threads{padding:12px 24px;display:flex;gap:10px;flex-wrap:wrap;border-bottom:.5px solid var(--border);background:rgba(12,12,12,.88);backdrop-filter:blur(8px);position:sticky;top:114px;z-index:90}
+.tbanner{flex:1;min-width:200px;border-radius:var(--r);padding:14px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;border:.5px solid;transition:all .2s;position:relative;overflow:hidden}
+.tbanner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none}
+.tbanner:hover{transform:translateY(-1px)}
+.tb-iran{background:var(--iran-bg);border-color:var(--iran-bdr)}
+.tb-iran:hover{border-color:rgba(192,57,43,.45);box-shadow:0 4px 24px rgba(192,57,43,.12)}
+.tb-narr{background:var(--narr-bg);border-color:var(--narr-bdr)}
+.tb-narr:hover{border-color:rgba(108,92,231,.45);box-shadow:0 4px 24px rgba(108,92,231,.12)}
+.tb-left{display:flex;flex-direction:column;gap:3px;text-align:left}
+.tb-eye{font-size:9px;font-weight:500;letter-spacing:.9px;text-transform:uppercase}
+.tb-iran .tb-eye{color:var(--iran-mut)}
+.tb-narr .tb-eye{color:var(--narr-mut)}
+.tb-title{font-family:'Instrument Serif',serif;font-size:16px;line-height:1.2}
+.tb-iran .tb-title{color:var(--iran-txt)}
+.tb-narr .tb-title{color:var(--narr-txt)}
+.tb-sub{font-size:11px}
+.tb-iran .tb-sub{color:var(--iran-mut)}
+.tb-narr .tb-sub{color:var(--narr-mut)}
+.tb-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tb-badge{font-size:9px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;padding:3px 8px;border-radius:20px}
+.tb-iran .tb-badge{background:rgba(192,57,43,.18);color:var(--iran-txt);border:.5px solid rgba(192,57,43,.28)}
+.tb-narr .tb-badge{background:rgba(108,92,231,.18);color:var(--narr-txt);border:.5px solid rgba(108,92,231,.28)}
+.tb-arr{font-size:16px;opacity:.35}
+
+/* ── MAIN FEED ── */
+#content{padding:0 24px 60px}
+.tsec{padding:28px 0 0}
+.tlabel{font-size:10px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.tlabel::after{content:'';flex:1;height:.5px;background:var(--border)}
+.cgrid{display:grid;grid-template-columns:1.55fr 1fr 1fr;grid-template-rows:auto auto;gap:10px}
+.card{background:var(--bg2);border:.5px solid var(--border);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s}
+.card:hover{border-color:var(--border2)}
+.cmeta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ctopic{font-size:9px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.tp-geo{background:#0a1f35;color:#7ab3e8;border:.5px solid #1a3a5a}
+.tp-tech{background:#1a0f35;color:#a89ae8;border:.5px solid #2a1f5a}
+.tp-biz{background:#0a2010;color:#7ac87a;border:.5px solid #1a3a1a}
+.tp-culture{background:#2a1a05;color:#e8b47a;border:.5px solid #4a2a10}
+.cregion{font-size:9px;color:var(--text3);padding:2px 8px;border-radius:20px;border:.5px solid var(--border);white-space:nowrap}
+.ctitle{font-family:'Instrument Serif',serif;font-size:15px;line-height:1.35;color:var(--text)}
+.hero .ctitle{font-size:22px}
+.csum{font-size:12px;color:var(--text2);line-height:1.6}
+.hero .csum{font-size:13px}
+.csrc{font-size:10px;color:var(--text3)}
+.bbar{margin-top:auto;padding-top:10px;border-top:.5px solid var(--border);display:flex;flex-direction:column;gap:5px}
+.brow{display:flex;align-items:flex-start;gap:6px}
+.blbl{font-size:9px;color:var(--text3);width:48px;flex-shrink:0;padding-top:2px;letter-spacing:.3px;text-transform:uppercase}
+.bpill{font-size:9px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.bn{background:#0a2010;color:#7ac87a;border:.5px solid #1a3a1a}
+.bc{background:#2a1a05;color:#e8b47a;border:.5px solid #4a2a10}
+.ba{background:#2a0505;color:#e87a7a;border:.5px solid #4a1010}
+.bnote{font-size:10px;color:var(--text3);flex:1;line-height:1.4}
+.mv{font-size:10px;color:var(--text3);font-style:italic;line-height:1.4}
+.ltog{margin-top:8px;font-size:10px;font-weight:500;color:var(--text3);cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:var(--rsm);border:.5px solid var(--border);background:transparent;width:fit-content;user-select:none;transition:all .15s}
+.ltog:hover{border-color:var(--border2);color:var(--text2)}
+.larr{font-size:8px;transition:transform .2s;display:inline-block}
+.larr.open{transform:rotate(180deg)}
+.lpanel{display:none;margin-top:6px;border:.5px solid var(--border);border-radius:var(--rsm);overflow:hidden}
+.lpanel.vis{display:block}
+.litem{padding:10px 12px;border-bottom:.5px solid var(--border);display:flex;flex-direction:column;gap:3px}
+.litem:last-child{border-bottom:none}
+.lname{font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase}
+.lr{color:#7ab3e8}.le{color:#7ac87a}.lh{color:#e8b47a}.lco{color:#e87a7a}
+.ltake{font-size:11px;color:var(--text2);line-height:1.5}
+.lload{padding:12px;font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px}
+
+/* ── SPINNERS ── */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{border-radius:50%;animation:spin .75s linear infinite;flex-shrink:0}
+.spin-sm{width:12px;height:12px;border:1.5px solid var(--border2);border-top-color:var(--text2)}
+.spin-md{width:20px;height:20px;border:2px solid var(--border2);border-top-color:var(--text)}
+.spin-ov{width:20px;height:20px;border:2px solid rgba(255,255,255,.1);border-top-color:rgba(255,255,255,.5)}
+.lst{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:12px}
+.ltxt{font-size:13px;color:var(--text3)}
+.err{background:var(--bg2);border-radius:var(--r);padding:20px;text-align:center;color:var(--text3);font-size:13px;margin:24px 0;border:.5px solid var(--border)}
+
+/* ── OVERLAY BASE ── */
+#ov{display:none;position:fixed;inset:0;z-index:999;overflow-y:auto}
+#ov.vis{display:block}
+.ov-inner{min-height:100%;display:flex;flex-direction:column}
+.ov-hdr{position:sticky;top:0;z-index:10;padding:14px 24px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(16px);border-bottom:.5px solid}
+.oh-iran{background:rgba(26,5,5,.95);border-color:var(--iran-bdr)}
+.oh-narr{background:rgba(6,6,20,.95);border-color:var(--narr-bdr)}
+.bkbtn{font-size:11px;padding:6px 12px;border-radius:var(--rsm);border:.5px solid;cursor:pointer;background:transparent;flex-shrink:0;transition:opacity .15s}
+.bkbtn:hover{opacity:.7}
+.oh-iran .bkbtn{border-color:rgba(192,57,43,.3);color:var(--iran-txt)}
+.oh-narr .bkbtn{border-color:rgba(108,92,231,.3);color:var(--narr-txt)}
+.ov-hdr-txt{flex:1}
+.ov-eye{font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px}
+.oh-iran .ov-eye{color:var(--iran-mut)}
+.oh-narr .ov-eye{color:var(--narr-mut)}
+.ov-ttl{font-family:'Instrument Serif',serif;font-size:22px}
+.oh-iran .ov-ttl{color:var(--iran-txt)}
+.oh-narr .ov-ttl{color:var(--narr-txt)}
+.ov-lbtn{font-size:11px;padding:7px 14px;border-radius:var(--rsm);border:.5px solid;cursor:pointer;font-weight:500;flex-shrink:0;transition:opacity .15s;background:transparent}
+.ov-lbtn:hover{opacity:.75}
+.oh-iran .ov-lbtn{border-color:rgba(192,57,43,.35);color:var(--iran-txt)}
+.oh-narr .ov-lbtn{border-color:rgba(108,92,231,.35);color:var(--narr-txt)}
+.ov-body{flex:1;padding:28px 24px 60px}
+.ob-iran{background:var(--iran-dark)}
+.ob-narr{background:var(--narr-dark)}
+
+/* ── IRAN TIMELINE ── */
+.tl{display:flex;flex-direction:column;position:relative;max-width:720px}
+.tl::before{content:'';position:absolute;left:7px;top:10px;bottom:10px;width:.5px}
+.tl-iran::before{background:rgba(192,57,43,.25)}
+.tli{display:flex;gap:18px;padding-bottom:28px;position:relative}
+.tldot{width:15px;height:15px;border-radius:50%;flex-shrink:0;margin-top:3px;border:2px solid}
+.tl-iran .tldot{background:var(--iran-dark);border-color:var(--iran-acc)}
+.tlc{flex:1}
+.tlt{font-size:10px;font-weight:500;letter-spacing:.3px;margin-bottom:5px}
+.tl-iran .tlt{color:rgba(192,57,43,.75)}
+.tlh-tl{font-family:'Instrument Serif',serif;font-size:17px;line-height:1.35;margin-bottom:6px;color:var(--iran-txt)}
+.tlb{font-size:12px;line-height:1.65;margin-bottom:10px;color:var(--iran-mut)}
+.tltog{font-size:10px;font-weight:500;padding:4px 10px;border-radius:20px;border:.5px solid;cursor:pointer;display:inline-flex;align-items:center;gap:5px;user-select:none;background:transparent;transition:opacity .15s}
+.tltog:hover{opacity:.7}
+.tl-iran .tltog{border-color:rgba(192,57,43,.22);color:rgba(192,57,43,.7)}
+.tlpanel{display:none;margin-top:10px;border-radius:var(--rsm);overflow:hidden;border:.5px solid}
+.tl-iran .tlpanel{border-color:rgba(192,57,43,.15)}
+.tlpanel.vis{display:block}
+.tllitem{padding:10px 14px;border-bottom:.5px solid}
+.tl-iran .tllitem{border-color:rgba(192,57,43,.1);background:rgba(192,57,43,.04)}
+.tllitem:last-child{border-bottom:none}
+.tlln{font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;margin-bottom:4px}
+.tlr{color:#7ab3e8}.tle{color:#7ac87a}.tlhu{color:#e8b47a}.tlco{color:#e87a7a}
+.tllt{font-size:11px;line-height:1.55;color:var(--iran-mut)}
+.tlload{display:flex;align-items:center;gap:8px;padding:10px 14px}
+.tllspin{width:12px;height:12px;border:1.5px solid rgba(255,255,255,.1);border-top-color:rgba(255,255,255,.4);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.tlltxt{font-size:11px;color:var(--iran-mut)}
+.ovload{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:12px}
+.ovltxt{font-size:13px;opacity:.35}
+.ob-iran .ovltxt{color:var(--iran-txt)}
+.ob-narr .ovltxt{color:var(--narr-txt)}
+
+/* ── NARRATIVES SYSTEM ── */
+.narr-clusters{display:flex;flex-direction:column;gap:0;max-width:900px}
+.cluster-tab{border-bottom:.5px solid rgba(108,92,231,.12)}
+.cluster-tab:last-child{border-bottom:none}
+
+.cluster-hdr-btn{width:100%;padding:16px 0;display:flex;align-items:center;gap:12px;cursor:pointer;background:transparent;border:none;text-align:left;transition:opacity .15s}
+.cluster-hdr-btn:hover{opacity:.8}
+.cl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.cl-name{font-size:13px;font-weight:500}
+.cl-count{font-size:10px;margin-left:8px;opacity:.45}
+.cl-arr{font-size:9px;margin-left:auto;opacity:.4;transition:transform .2s;display:inline-block}
+.cl-arr.open{transform:rotate(180deg)}
+
+/* cluster colors */
+.cl-tech .cl-dot{background:#7F77DD}.cl-tech .cl-name{color:#AFA9EC}
+.cl-econ .cl-dot{background:#1D9E75}.cl-econ .cl-name{color:#5DCAA5}
+.cl-power .cl-dot{background:#D85A30}.cl-power .cl-name{color:#F0997B}
+.cl-society .cl-dot{background:#BA7517}.cl-society .cl-name{color:#EF9F27}
+.cl-env .cl-dot{background:#0F6E56}.cl-env .cl-name{color:#1D9E75}
+
+.narrative-list{display:none;flex-wrap:wrap;gap:8px;padding-bottom:18px}
+.narrative-list.open{display:flex}
+
+.narr-pill{font-size:11px;padding:6px 14px;border-radius:20px;border:.5px solid;cursor:pointer;transition:all .15s;background:transparent}
+.narr-pill:hover{opacity:.85;transform:translateY(-1px)}
+.cl-tech .narr-pill{border-color:rgba(127,119,221,.3);color:#AFA9EC}
+.cl-tech .narr-pill:hover{background:rgba(127,119,221,.08);border-color:rgba(127,119,221,.5)}
+.cl-econ .narr-pill{border-color:rgba(29,158,117,.3);color:#5DCAA5}
+.cl-econ .narr-pill:hover{background:rgba(29,158,117,.08);border-color:rgba(29,158,117,.5)}
+.cl-power .narr-pill{border-color:rgba(216,90,48,.3);color:#F0997B}
+.cl-power .narr-pill:hover{background:rgba(216,90,48,.08);border-color:rgba(216,90,48,.5)}
+.cl-society .narr-pill{border-color:rgba(186,117,23,.3);color:#EF9F27}
+.cl-society .narr-pill:hover{background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.5)}
+.cl-env .narr-pill{border-color:rgba(15,110,86,.3);color:#1D9E75}
+.cl-env .narr-pill:hover{background:rgba(15,110,86,.08);border-color:rgba(15,110,86,.5)}
+
+/* ── NARRATIVE DEEP DIVE ── */
+#nv-ov{display:none;position:fixed;inset:0;z-index:1000;overflow-y:auto;background:var(--narr-dark)}
+#nv-ov.vis{display:block}
+.nv-hdr{position:sticky;top:0;z-index:10;background:rgba(3,3,15,.95);backdrop-filter:blur(16px);border-bottom:.5px solid rgba(108,92,231,.2);padding:14px 24px;display:flex;align-items:center;gap:14px}
+.nv-back{font-size:11px;padding:6px 12px;border-radius:var(--rsm);border:.5px solid rgba(108,92,231,.3);color:var(--narr-txt);cursor:pointer;background:transparent;transition:opacity .15s;flex-shrink:0}
+.nv-back:hover{opacity:.7}
+.nv-hdr-txt{flex:1}
+.nv-cluster-label{font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;margin-bottom:2px;opacity:.45}
+.nv-title{font-family:'Instrument Serif',serif;font-size:20px;color:var(--narr-txt)}
+.nv-body{padding:32px 24px 60px;max-width:760px}
+
+/* briefing */
+.nv-briefing{margin-bottom:32px}
+.nv-briefing-loading{display:flex;align-items:center;gap:10px;padding:20px 0;font-size:13px;opacity:.4;color:var(--narr-txt)}
+.nv-briefing-spin{width:16px;height:16px;border:2px solid rgba(108,92,231,.2);border-top-color:rgba(108,92,231,.7);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.nv-section-label{font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:rgba(108,92,231,.6);margin-bottom:12px}
+.nv-briefing-text{font-size:13px;line-height:1.75;color:var(--narr-mut)}
+.nv-briefing-text p{margin-bottom:10px}
+.nv-briefing-text p:last-child{margin-bottom:0}
+.nv-stat-row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.nv-stat{background:rgba(108,92,231,.06);border:.5px solid rgba(108,92,231,.15);border-radius:var(--rsm);padding:12px 16px;flex:1;min-width:140px}
+.nv-stat-val{font-family:'Instrument Serif',serif;font-size:20px;color:var(--narr-txt);margin-bottom:3px}
+.nv-stat-lbl{font-size:10px;color:var(--narr-mut)}
+.nv-divider{height:.5px;background:rgba(108,92,231,.12);margin:28px 0}
+
+/* narrative timeline */
+.nv-tl{display:flex;flex-direction:column;position:relative}
+.nv-tl::before{content:'';position:absolute;left:7px;top:10px;bottom:10px;width:.5px;background:rgba(108,92,231,.2)}
+.nv-tli{display:flex;gap:18px;padding-bottom:24px}
+.nv-dot{width:15px;height:15px;border-radius:50%;flex-shrink:0;margin-top:3px;border:2px solid rgba(108,92,231,.6);background:var(--narr-dark)}
+.nv-tlc{flex:1}
+.nv-tlt{font-size:10px;font-weight:500;color:rgba(108,92,231,.7);letter-spacing:.3px;margin-bottom:4px}
+.nv-tlh{font-family:'Instrument Serif',serif;font-size:15px;line-height:1.35;color:var(--narr-txt);margin-bottom:5px}
+.nv-tlb{font-size:12px;line-height:1.6;color:var(--narr-mut)}
+.nv-src{font-size:10px;color:rgba(196,184,245,.3);margin-top:4px}
+
+@media(max-width:600px){.cgrid{grid-template-columns:1fr}.hw{grid-row:auto!important}#threads{top:130px}}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="tbrow">
+    <div class="logo">Pul<em>se</em></div>
+    <div style="flex:1"></div>
+    <button class="fbtn" id="rfbtn">Fetch news ↗</button>
+  </div>
+  <div class="tbrow">
+    <span class="flabel">Topic</span>
+    <div class="fgroup" id="tpf">
+      <div class="chip at" data-t="all">All</div>
+      <div class="chip" data-t="geo">Geopolitics</div>
+      <div class="chip" data-t="tech">Tech & AI</div>
+      <div class="chip" data-t="biz">Business</div>
+      <div class="chip" data-t="culture">Culture</div>
+    </div>
+  </div>
+  <div class="tbrow">
+    <span class="flabel">Region</span>
+    <div class="fgroup" id="rgf">
+      <div class="chip ar" data-r="all">All</div>
+      <div class="chip" data-r="global">Global</div>
+      <div class="chip" data-r="europe">Europe</div>
+      <div class="chip" data-r="americas">Americas</div>
+      <div class="chip" data-r="middle-east">Middle East</div>
+      <div class="chip" data-r="asean">ASEAN</div>
+      <div class="chip" data-r="east-asia">East Asia</div>
+      <div class="chip" data-r="south-asia">South Asia</div>
+      <div class="chip" data-r="africa">Africa</div>
+    </div>
+  </div>
+</div>
+
+<div id="threads">
+  <button class="tbanner tb-iran" data-th="iran">
+    <div class="tb-left">
+      <span class="tb-eye">Developing story</span>
+      <span class="tb-title">War in Iran</span>
+      <span class="tb-sub">Conflict, diplomacy &amp; regional fallout</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-badge">● Live</span>
+      <span class="tb-arr">→</span>
+    </div>
+  </button>
+  <button class="tbanner tb-narr" data-th="narratives">
+    <div class="tb-left">
+      <span class="tb-eye">2026 series</span>
+      <span class="tb-title">Emerging Global Narratives</span>
+      <span class="tb-sub">34 threads reshaping the world</span>
+    </div>
+    <div class="tb-right">
+      <span class="tb-badge">34 threads</span>
+      <span class="tb-arr">→</span>
+    </div>
+  </button>
+</div>
+
+<div id="content">
+  <div class="lst" id="lst" style="display:none">
+    <div class="spin spin-md"></div>
+    <div class="ltxt" id="ltxt">Scanning headlines...</div>
+  </div>
+  <div id="feed"></div>
+  <div class="lst" id="init"><div class="ltxt">Click "Fetch news" to load the latest stories.</div></div>
+</div>
+
+<!-- Iran overlay -->
+<div id="ov">
+  <div class="ov-inner">
+    <div class="ov-hdr" id="ovhdr">
+      <button class="bkbtn" id="bkbtn">← Back</button>
+      <div class="ov-hdr-txt">
+        <div class="ov-eye" id="oveye"></div>
+        <div class="ov-ttl" id="ovttl"></div>
+      </div>
+      <button class="ov-lbtn" id="ovlbtn">Refresh ↗</button>
+    </div>
+    <div class="ov-body" id="ovbody"></div>
+  </div>
+</div>
+
+<!-- Narratives index overlay -->
+<div id="nv-idx">
+  <div style="display:none;position:fixed;inset:0;z-index:999;overflow-y:auto;background:var(--narr-dark)" id="nv-idx-inner">
+    <div style="position:sticky;top:0;z-index:10;background:rgba(3,3,15,.95);backdrop-filter:blur(16px);border-bottom:.5px solid rgba(108,92,231,.2);padding:14px 24px;display:flex;align-items:center;gap:14px">
+      <button class="nv-back" id="nv-idx-back">← Back</button>
+      <div style="flex:1">
+        <div style="font-size:9px;font-weight:500;letter-spacing:.8px;text-transform:uppercase;color:var(--narr-mut);margin-bottom:2px">2026 series</div>
+        <div style="font-family:'Instrument Serif',serif;font-size:22px;color:var(--narr-txt)">Emerging Global Narratives</div>
+      </div>
+    </div>
+    <div style="padding:28px 24px 60px;max-width:900px" id="nv-clusters"></div>
+  </div>
+</div>
+
+<!-- Narrative deep dive -->
+<div id="nv-ov">
+  <div class="nv-hdr">
+    <button class="nv-back" id="nv-ov-back">← All narratives</button>
+    <div class="nv-hdr-txt">
+      <div class="nv-cluster-label" id="nv-cl-label"></div>
+      <div class="nv-title" id="nv-ttl"></div>
+    </div>
+  </div>
+  <div class="nv-body" id="nv-body"></div>
+</div>
+
+<script>
+// ── DATA ──
+const CLUSTERS = [
+  { id:'tech', name:'Technology', cls:'cl-tech', narratives:[
+    'Competing technology ecosystems','AI as infrastructure','Internet fragmentation',
+    'Cognitive labor automation','Computing as strategic resource','Semiconductor geopolitics',
+    'Tech companies as infrastructure','Synthetic media expansion','Cybersecurity arms race'
+  ]},
+  { id:'econ', name:'Economy', cls:'cl-econ', narratives:[
+    'Security over efficiency in supply chains','Regional supply chain networks',
+    'Industrial policy revival','Asia\'s growing economic weight','Global South as growth driver',
+    'Algorithmic financial systems','Data center expansion','Defense tech startup phase'
+  ]},
+  { id:'power', name:'Power & Geopolitics', cls:'cl-power', narratives:[
+    'Multiple crises interacting','Middle powers rising','Digital sovereignty',
+    'Critical minerals competition','Space in the global economy',
+    'Multipolar scramble','Hormuz shock & energy fragility'
+  ]},
+  { id:'society', name:'Society', cls:'cl-society', narratives:[
+    'Streets vs. elites','Aging populations','Cities as economic centers',
+    'Individuals empowered by AI','Digital identity systems','Online governance experiments'
+  ]},
+  { id:'env', name:'Environment & Energy', cls:'cl-env', narratives:[
+    'Energy transition dependencies','Climate adaptation as economy',
+    'South–South rise','Hardware vs. software divergence'
+  ]}
+];
+
+const TM={geo:{l:'Geopolitics',c:'tp-geo'},tech:{l:'Tech & AI',c:'tp-tech'},biz:{l:'Business',c:'tp-biz'},culture:{l:'Internet Culture',c:'tp-culture'}};
+const RL={global:'Global',europe:'Europe',americas:'Americas','middle-east':'Middle East',asean:'ASEAN','east-asia':'East Asia','south-asia':'South Asia',africa:'Africa'};
+const CLC=[{k:'realist',l:'The Realist',c:'lr'},{k:'economist',l:'The Economist',c:'le'},{k:'humanist',l:'The Humanist',c:'lh'},{k:'contrarian',l:'The Contrarian',c:'lco'}];
+const TLC=[{k:'realist',l:'The Realist',c:'tlr'},{k:'economist',l:'The Economist',c:'tle'},{k:'humanist',l:'The Humanist',c:'tlhu'},{k:'contrarian',l:'The Contrarian',c:'tlco'}];
+
+// ── IRAN OVERLAY ──
+let activeThread = null;
+document.querySelectorAll('.tbanner').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.th === 'iran') openIran();
+  else openNarrIndex();
+}));
+document.getElementById('bkbtn').addEventListener('click', closeIran);
+document.getElementById('ovlbtn').addEventListener('click', () => {
+  if (activeThread) {
+    document.getElementById('ovbody').innerHTML = '<div class="ovload"><div class="spin spin-ov"></div><div class="ovltxt">Refreshing...</div></div>';
+    loadIran();
+  }
+});
+
+function openIran() {
+  activeThread = 'iran';
+  document.getElementById('oveye').textContent = 'Developing story';
+  document.getElementById('ovttl').textContent = 'War in Iran';
+  document.getElementById('ovhdr').className = 'ov-hdr oh-iran';
+  const body = document.getElementById('ovbody');
+  body.className = 'ov-body ob-iran';
+  body.innerHTML = '<div class="ovload"><div class="spin spin-ov"></div><div class="ovltxt">Loading updates...</div></div>';
+  document.getElementById('ov').classList.add('vis');
+  document.body.style.overflow = 'hidden';
+  loadIran();
+}
+function closeIran() { document.getElementById('ov').classList.remove('vis'); document.body.style.overflow = ''; activeThread = null; }
+
+async function loadIran() {
+  const body = document.getElementById('ovbody');
+  const prompt = `You are a senior war correspondent. Search the web for the 5 most recent real developments on the conflict involving Iran — military operations, diplomatic talks, humanitarian situation, regional reactions. Most recent first.\n\nReturn ONLY raw JSON array, no markdown:\n[{"time":"e.g. Mar 17, 14:30 UTC","headline":"sharp update headline","body":"2-3 sentence factual summary","source":"source name"}]`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:prompt}]})});
+    const data = await res.json();
+    const raw = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const updates = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    body.innerHTML = '';
+    const tl = document.createElement('div'); tl.className = 'tl tl-iran';
+    updates.forEach(u => {
+      const item = document.createElement('div'); item.className = 'tli';
+      item.innerHTML = `<div class="tldot"></div><div class="tlc"><div class="tlt">${u.time} · ${u.source}</div><div class="tlh-tl">${u.headline}</div><div class="tlb">${u.body}</div><button class="tltog tl-iran" data-open="false">◆ Analyst lenses <span class="larr">▲</span></button><div class="tlpanel tl-iran"><div class="tlload"><div class="tllspin"></div><span class="tlltxt">Summoning analysts...</span></div></div></div>`;
+      const tog=item.querySelector('.tltog'),panel=item.querySelector('.tlpanel'),arr=item.querySelector('.larr');let loaded=false;
+      tog.addEventListener('click',async()=>{const open=tog.dataset.open==='true';if(open){panel.classList.remove('vis');arr.classList.remove('open');tog.dataset.open='false';}else{panel.classList.add('vis');arr.classList.add('open');tog.dataset.open='true';if(!loaded){loaded=true;await fetchTlLens(u,panel);}}});
+      tl.appendChild(item);
+    });
+    body.appendChild(tl);
+  } catch(e) { body.innerHTML = '<div style="padding:40px;text-align:center;font-size:13px;opacity:.3;color:#F5C6C6">Could not load updates. Try again.</div>'; }
+}
+
+async function fetchTlLens(u, panel) {
+  const p = `Four analytical minds on: "${u.headline}". Context: "${u.body}". Return ONLY raw JSON:\n{"realist":"2 sentences","economist":"2 sentences","humanist":"2 sentences","contrarian":"2 sentences"}`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,messages:[{role:"user",content:p}]})});
+    const data = await res.json();
+    const raw = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const lenses = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    panel.innerHTML = TLC.map(l=>`<div class="tllitem"><div class="tlln ${l.c}">${l.l}</div><div class="tllt">${lenses[l.k]}</div></div>`).join('');
+  } catch(e) { panel.innerHTML = '<div class="tlload"><span class="tlltxt">Could not load.</span></div>'; }
+}
+
+// ── NARRATIVES INDEX ──
+function buildNarrIndex() {
+  const container = document.getElementById('nv-clusters');
+  container.innerHTML = '';
+  const wrap = document.createElement('div'); wrap.className = 'narr-clusters';
+  CLUSTERS.forEach(cluster => {
+    const tab = document.createElement('div'); tab.className = 'cluster-tab';
+    const btn = document.createElement('button');
+    btn.className = `cluster-hdr-btn ${cluster.cls}`;
+    btn.innerHTML = `<div class="cl-dot"></div><div class="cl-name">${cluster.name}</div><span class="cl-count">${cluster.narratives.length} narratives</span><span class="cl-arr">▲</span>`;
+    const list = document.createElement('div'); list.className = `narrative-list ${cluster.cls}`;
+    cluster.narratives.forEach(n => {
+      const pill = document.createElement('button');
+      pill.className = 'narr-pill';
+      pill.textContent = n;
+      pill.addEventListener('click', () => openNarrative(n, cluster));
+      list.appendChild(pill);
+    });
+    let open = false;
+    btn.addEventListener('click', () => {
+      open = !open;
+      list.classList.toggle('open', open);
+      btn.querySelector('.cl-arr').classList.toggle('open', open);
+    });
+    tab.appendChild(btn); tab.appendChild(list);
+    wrap.appendChild(tab);
+  });
+  container.appendChild(wrap);
+}
+
+function openNarrIndex() {
+  buildNarrIndex();
+  document.getElementById('nv-idx-inner').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+function closeNarrIndex() { document.getElementById('nv-idx-inner').style.display = 'none'; document.body.style.overflow = ''; }
+document.getElementById('nv-idx-back').addEventListener('click', closeNarrIndex);
+
+// ── NARRATIVE DEEP DIVE ──
+function openNarrative(name, cluster) {
+  document.getElementById('nv-cl-label').textContent = cluster.name;
+  document.getElementById('nv-cl-label').style.color = getClusterColor(cluster.id);
+  document.getElementById('nv-ttl').textContent = name;
+  const body = document.getElementById('nv-body');
+  body.innerHTML = '<div class="nv-briefing"><div class="nv-briefing-loading"><div class="nv-briefing-spin"></div>Loading briefing...</div></div>';
+  document.getElementById('nv-ov').classList.add('vis');
+  loadNarrBriefing(name, cluster, body);
+}
+function closeNarrative() { document.getElementById('nv-ov').classList.remove('vis'); }
+document.getElementById('nv-ov-back').addEventListener('click', closeNarrative);
+
+function getClusterColor(id) {
+  return {tech:'#AFA9EC',econ:'#5DCAA5',power:'#F0997B',society:'#EF9F27',env:'#1D9E75'}[id] || '#c4b8f5';
+}
+
+async function loadNarrBriefing(name, cluster, body) {
+  const color = getClusterColor(cluster.id);
+  const prompt = `You are a senior global analyst. Search the web for current information about this emerging global narrative: "${name}".
+
+Return ONLY raw JSON, no markdown:
+{
+  "what": "2-3 sentence explanation of what this narrative is",
+  "why_now": "2-3 sentences on why this is particularly important or accelerating in 2026",
+  "watch_for": "2-3 sentences on key developments, indicators or events to watch",
+  "stats": [
+    {"val": "a compelling statistic or data point", "label": "what it measures"},
+    {"val": "another statistic", "label": "what it measures"}
+  ],
+  "events": [
+    {"time": "e.g. Mar 2026", "headline": "a recent real event connected to this narrative", "body": "1-2 sentence description", "source": "source name"},
+    {"time": "...", "headline": "...", "body": "...", "source": "..."},
+    {"time": "...", "headline": "...", "body": "...", "source": "..."},
+    {"time": "...", "headline": "...", "body": "...", "source": "..."},
+    {"time": "...", "headline": "...", "body": "...", "source": "..."}
+  ]
+}`;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1600,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:prompt}]})});
+    const data = await res.json();
+    const raw = data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const d = JSON.parse(raw.replace(/```json|```/g,'').trim());
+    renderNarrPage(d, color, body);
+  } catch(e) { body.innerHTML = `<div style="padding:40px;text-align:center;font-size:13px;opacity:.3;color:var(--narr-txt)">Could not load briefing. Try again.</div>`; }
+}
+
+function renderNarrPage(d, color, body) {
+  const statsHtml = (d.stats||[]).map(s=>`<div class="nv-stat"><div class="nv-stat-val">${s.val}</div><div class="nv-stat-lbl">${s.label}</div></div>`).join('');
+  const eventsHtml = (d.events||[]).map(e=>`
+    <div class="nv-tli">
+      <div class="nv-dot" style="border-color:${color}60"></div>
+      <div class="nv-tlc">
+        <div class="nv-tlt" style="color:${color}88">${e.time} · ${e.source}</div>
+        <div class="nv-tlh">${e.headline}</div>
+        <div class="nv-tlb">${e.body}</div>
+      </div>
+    </div>`).join('');
+
+  body.innerHTML = `
+    <div class="nv-briefing">
+      <div class="nv-section-label" style="color:${color}99">What is this</div>
+      <div class="nv-briefing-text"><p>${d.what}</p></div>
+      ${statsHtml ? `<div class="nv-stat-row">${statsHtml}</div>` : ''}
+      <div class="nv-divider" style="background:${color}18"></div>
+      <div class="nv-section-label" style="color:${color}99">Why now</div>
+      <div class="nv-briefing-text"><p>${d.why_now}</p></div>
+      <div class="nv-divider" style="background:${color}18"></div>
+      <div class="nv-section-label" style="color:${color}99">Watch for</div>
+      <div class="nv-briefing-text"><p>${d.watch_for}</p></div>
+    </div>
+    <div class="nv-divider" style="background:${color}18"></div>
+    <div class="nv-section-label" style="color:${color}99;margin-bottom:16px">Recent events</div>
+    <div class="nv-tl">${eventsHtml}</div>`;
+}
+
+// ── MAIN FEED ──
+let atp='all',arg='all';
+document.getElementById('tpf').addEventListener('click',e=>{const c=e.target.closest('[data-t]');if(!c)return;document.querySelectorAll('[data-t]').forEach(x=>x.classList.remove('at'));c.classList.add('at');atp=c.dataset.t;filt();});
+document.getElementById('rgf').addEventListener('click',e=>{const c=e.target.closest('[data-r]');if(!c)return;document.querySelectorAll('[data-r]').forEach(x=>x.classList.remove('ar'));c.classList.add('ar');arg=c.dataset.r;filt();});
+function filt(){
+  document.querySelectorAll('.cw').forEach(w=>{const s=(atp==='all'||w.dataset.t===atp)&&(arg==='all'||w.dataset.r===arg);w.style.display=s?'':'none';});
+  document.querySelectorAll('.tsec').forEach(s=>{s.style.display=[...s.querySelectorAll('.cw')].some(w=>w.style.display!=='none')?'':'none';});
+}
+const LM=['Scanning headlines...','Mapping regions...','Analysing tone & framing...','Building your digest...'];
+let mi=0,mt;
+function startL(){mi=0;document.getElementById('ltxt').textContent=LM[0];mt=setInterval(()=>{mi=(mi+1)%LM.length;document.getElementById('ltxt').textContent=LM[mi];},2000);}
+function stopL(){clearInterval(mt);}
+document.getElementById('rfbtn').addEventListener('click',fetchNews);
+
+async function fetchNews(){
+  document.getElementById('init').style.display='none';
+  document.getElementById('feed').innerHTML='';
+  document.getElementById('lst').style.display='flex';
+  startL();
+  const p=`Senior global news editor. Search the web for 5 real current news stories. Return ONLY raw JSON array:\n[{"topic":"geo"|"tech"|"biz"|"culture","region":"global"|"europe"|"americas"|"middle-east"|"asean"|"east-asia"|"south-asia"|"africa","headline":"...","summary":"2-3 sentences","source":"...","hero":true,"bias":{"tone":"neutral"|"alarming"|"emotional","toneNote":"one sentence","framing":"one sentence","missingVoices":"one sentence"}},...4 more with hero:false]\nFirst item hero:true. Ensure region diversity.`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1200,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:p}]})});
+    const data=await res.json();
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const stories=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    stopL();document.getElementById('lst').style.display='none';
+    renderFeed(stories,new Date());filt();
+  }catch(e){stopL();document.getElementById('lst').style.display='none';document.getElementById('feed').innerHTML='<div class="err">Could not load stories. Try again.</div>';}
+}
+
+function bpc(t){return t==='neutral'?'bn':t==='alarming'?'ba':'bc';}
+function renderFeed(stories,ts){
+  const sec=document.createElement('div');sec.className='tsec';
+  const mins=Math.floor((Date.now()-ts.getTime())/60000);
+  const lbl=mins<1?'Just now':mins<60?`${mins}m ago`:`${Math.floor(mins/60)}h ago`;
+  sec.innerHTML=`<div class="tlabel">${lbl}</div>`;
+  const grid=document.createElement('div');grid.className='cgrid';
+  const hero=stories.find(s=>s.hero)||stories[0];
+  const rest=stories.filter(s=>s!==hero);
+  [hero,...rest].forEach((s,i)=>{
+    const w=document.createElement('div');w.className='cw';w.dataset.t=s.topic;w.dataset.r=s.region;
+    if(i===0)w.style.gridRow='1 / 3';
+    const tm=TM[s.topic]||{l:s.topic,c:'tp-geo'};
+    const rl=RL[s.region]||s.region;
+    const bp=bpc(s.bias.tone);
+    w.innerHTML=`<div class="card${i===0?' hero':''}"><div class="cmeta"><span class="ctopic ${tm.c}">${tm.l}</span><span class="cregion">${rl}</span></div><div class="ctitle">${s.headline}</div><div class="csum">${s.summary}</div><div class="csrc">${s.source}</div><div class="bbar"><div class="brow"><span class="blbl">Tone</span><span class="bpill ${bp}">${s.bias.tone}</span><span class="bnote">${s.bias.toneNote}</span></div><div class="brow"><span class="blbl">Framing</span><span class="bnote">${s.bias.framing}</span></div><div class="mv">Missing voices: ${s.bias.missingVoices}</div></div><div class="ltog" data-open="false"><span style="font-size:9px">◆</span> Analyst lenses <span class="larr">▲</span></div><div class="lpanel"><div class="lload"><div class="spin spin-sm"></div>Loading...</div></div></div>`;
+    const tog=w.querySelector('.ltog'),panel=w.querySelector('.lpanel'),arr=w.querySelector('.larr');let ld=false;
+    tog.addEventListener('click',async()=>{const op=tog.dataset.open==='true';if(op){panel.classList.remove('vis');arr.classList.remove('open');tog.dataset.open='false';}else{panel.classList.add('vis');arr.classList.add('open');tog.dataset.open='true';if(!ld){ld=true;await fetchCLens(s,panel);}}});
+    grid.appendChild(w);
+  });
+  sec.appendChild(grid);document.getElementById('feed').prepend(sec);
+}
+
+async function fetchCLens(s,panel){
+  const p=`Four analytical minds on: "${s.headline}". Summary: "${s.summary}". Return ONLY raw JSON:\n{"realist":"2 sentences","economist":"2 sentences","humanist":"2 sentences","contrarian":"2 sentences"}`;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:400,messages:[{role:"user",content:p}]})});
+    const data=await res.json();
+    const raw=data.content.filter(b=>b.type==='text').map(b=>b.text).join('');
+    const lenses=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    panel.innerHTML=CLC.map(l=>`<div class="litem"><span class="lname ${l.c}">${l.l}</span><div class="ltake">${lenses[l.k]}</div></div>`).join('');
+  }catch(e){panel.innerHTML='<div class="lload">Could not load lenses.</div>';}
+}
+</script>
+</body>
+</html>
